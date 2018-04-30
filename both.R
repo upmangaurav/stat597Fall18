@@ -60,7 +60,8 @@ ui <- shinyUI(navbarPage("Top Music Charts",
             tabPanel("Last.FM",                      
              sidebarLayout(
                sidebarPanel(
-                 selectInput("videoNameLastFM", "Select your choice", paste(c(1:100), sep = ". ", unlist(search_list_last_fm))[1:5])
+                 selectInput("videoNameLastFM", "Select your choice",
+                             paste(c(1:100), sep = ". ", unlist(search_list_last_fm))[1:20])
                  ),
                uiOutput("video_lastfm")
              )
@@ -69,7 +70,8 @@ ui <- shinyUI(navbarPage("Top Music Charts",
             tabPanel("iTunes", 
              sidebarLayout(
                sidebarPanel(
-                 selectInput("videoNameITunes", "Select your choice", paste(c(1:100), sep = ". ", unlist(search_list_itunes))[1:5])
+                 selectInput("videoNameITunes", "Select your choice",
+                             paste(c(1:100), sep = ". ", unlist(search_list_itunes))[1:20])
                ),
                uiOutput("video_itunes")
              )
@@ -80,7 +82,7 @@ ui <- shinyUI(navbarPage("Top Music Charts",
 server <- function(input, output) {  
 
   choiceLastFM <- reactive({
-    input$videoNameLastFM
+    str_replace(input$videoNameLastFM, pattern = "(\\d+. )", "")
     })
   
   output$video_lastfm <- renderUI({
@@ -92,7 +94,7 @@ server <- function(input, output) {
 
   
   choiceITunes <- reactive({
-    input$videoNameITunes
+    str_replace(input$videoNameITunes, pattern = "(\\d+. )", "")
   })
   
   output$video_itunes <- renderUI({
