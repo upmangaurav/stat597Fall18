@@ -53,41 +53,78 @@ for (i in 1:length(intermediate)/2){
   search_list_itunes[i] <- paste0(intermediate[j-2], ", ", intermediate[j-1])
 }
 
+#------------x------------------x------------------------------
+#Billboard:
+
+bb_url = "https://www.billboard.com/charts/hot-100"
+bb_charts_page = read_html(bb_url)
+
+bb_list <- bb_charts_page %>%
+  html_nodes(".chart-row__artist , .chart-row__song") %>%
+  html_text()
+
+search_list_bb <- list() #Initialize empty list
+for (i in 1:length(bb_list)/2){
+  j = i*2
+  search_list_bb[i] <- paste0(bb_list[j - 2], ", ", str_replace_all(bb_list[j - 1],"\n",""))
+}
+
 #---------x-----------------x-------------------x-------------
 # App code starts here:
 
 ui <- shinyUI(navbarPage("Top Music Charts",
-            tabPanel("Last.FM",                      
+           tabPanel("BillBoard",                      
+                    sidebarLayout(
+                      sidebarPanel(
+                        radioButtons("videoNamebb", "Select your choice",
+                                     choices = paste(c(1:100), sep = ". ", search_list_bb)[1:20])
+                      ),
+                      uiOutput("video_bb")
+                    )
+           ),
+                         
+           tabPanel("iTunes", 
+                    sidebarLayout(
+                      sidebarPanel(
+                        selectInput("videoNameITunes", "Select your choice",
+                                    paste(c(1:100), sep = ". ", search_list_itunes)[1:20])
+                      ),
+                      uiOutput("video_itunes")
+                    )
+           ),
+           
+           tabPanel("Last.FM",                      
              sidebarLayout(
                sidebarPanel(
-                 selectInput("videoNameLastFM", "Select your choice",
-                             paste(c(1:100), sep = ". ", unlist(search_list_last_fm))[1:20])
+                 radioButtons("videoNameLastFM", "Select your choice",
+                              choices = paste(c(1:100), sep = ". ", search_list_last_fm)[1:20])
                  ),
                uiOutput("video_lastfm")
              )
-    ),
-            
-            tabPanel("iTunes", 
-             sidebarLayout(
-               sidebarPanel(
-                 selectInput("videoNameITunes", "Select your choice",
-                             paste(c(1:100), sep = ". ", unlist(search_list_itunes))[1:20])
-               ),
-               uiOutput("video_itunes")
-             )
     )
-            
 ))
 
 server <- function(input, output) {  
 
+    choicebb <- reactive({
+    str_replace(input$videoNamebb, pattern = "(\\d+. )", "")
+  })
+  
+  output$video_bb <- renderUI({
+    if(!is.null(choicebb())){
+      HTML(paste0('<iframe width="900" height="570" src="https://www.youtube.com/embed/',
+                  get_youtube_videoID(choicebb()) ,'" frameborder="0" allowfullscreen></iframe>'))
+    }
+  })
+  
+  
   choiceLastFM <- reactive({
     str_replace(input$videoNameLastFM, pattern = "(\\d+. )", "")
     })
   
   output$video_lastfm <- renderUI({
     if(!is.null(choiceLastFM())){
-      HTML(paste0('<iframe width="500" height="300" src="https://www.youtube.com/embed/',
+      HTML(paste0('<iframe width="900" height="570" src="https://www.youtube.com/embed/',
                   get_youtube_videoID(choiceLastFM()) ,'" frameborder="0" allowfullscreen></iframe>'))
     }
   })
@@ -99,7 +136,7 @@ server <- function(input, output) {
   
   output$video_itunes <- renderUI({
     if(!is.null(choiceITunes())){
-      HTML(paste0('<iframe width="500" height="300" src="https://www.youtube.com/embed/',
+      HTML(paste0('<iframe width="900" height="570" src="https://www.youtube.com/embed/',
                   get_youtube_videoID(choiceITunes()) ,'" frameborder="0" allowfullscreen></iframe>'))
     }
   })
