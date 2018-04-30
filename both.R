@@ -86,8 +86,8 @@ ui <- shinyUI(navbarPage("Top Music Charts",
            tabPanel("iTunes", 
                     sidebarLayout(
                       sidebarPanel(
-                        selectInput("videoNameITunes", "Select your choice",
-                                    paste(c(1:100), sep = ". ", search_list_itunes)[1:20])
+                        radioButtons("videoNameITunes", "Select your choice",
+                                     choices = paste(c(1:100), sep = ". ", search_list_itunes)[1:20])
                       ),
                       uiOutput("video_itunes")
                     )
@@ -96,8 +96,8 @@ ui <- shinyUI(navbarPage("Top Music Charts",
            tabPanel("Last.FM",                      
              sidebarLayout(
                sidebarPanel(
-                 radioButtons("videoNameLastFM", "Select your choice",
-                              choices = paste(c(1:100), sep = ". ", search_list_last_fm)[1:20])
+                 selectInput("videoNameLastFM", "Select your choice",
+                              paste(c(1:100), sep = ". ", search_list_last_fm)[1:20])
                  ),
                uiOutput("video_lastfm")
              )
@@ -143,5 +143,5 @@ server <- function(input, output) {
   
   }
 
-
+ 
 shinyApp(ui = ui, server = server)
